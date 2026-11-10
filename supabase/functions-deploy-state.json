@@ -1,0 +1,13 @@
+{
+  "projectId": "72768594",
+  "functions": {
+    "admin-users": {
+      "hasChanged": false,
+      "hash": "bcb609749f82f22d4ac5315d26036838f31703649d57cab907908629c36f5e39"
+    },
+    "vcenter-connection": {
+      "hasChanged": false,
+      "hash": "2748b941a8459cde3c49ed30d08a866c2023dab23ec7e8bf8e2ac834f27d46d5"
+    }
+  }
+}

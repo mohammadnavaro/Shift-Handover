@@ -1,0 +1,5 @@
+[functions.admin-users]
+verify_jwt = true
+
+[functions.vcenter-connection]
+verify_jwt = true
