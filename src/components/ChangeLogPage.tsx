@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LogOut, ScrollText, ShieldCheck } from 'lucide-react';
+import { FileText, LogOut, ScrollText, ShieldCheck } from 'lucide-react';
 import ShiftSection from '@/components/ShiftSection';
 import ShiftSwitcher from '@/components/ShiftSwitcher';
 import StatusBar from '@/components/StatusBar';
@@ -142,12 +142,24 @@ export default function ChangeLogPage({ userEmail, isAdmin, onSignOut }: ChangeL
         <StatusBar now={now} />
 
         <div className="sticky top-16 z-20 -mx-5 mt-6 border-b border-stone-200 bg-stone-100/95 px-5 py-3 shadow-sm backdrop-blur">
-          <DayPicker
-            selectedDay={selectedDay}
-            eventDays={eventDays}
-            onPickDay={handlePickDay}
-            onClear={handleClear}
-          />
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <DayPicker
+                selectedDay={selectedDay}
+                eventDays={eventDays}
+                onPickDay={handlePickDay}
+                onClear={handleClear}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setScopeDayKey(selectedDay ?? currentShift.dayKey)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-800 transition hover:border-stone-500"
+            >
+              <FileText size={14} aria-hidden />
+              گزارش
+            </button>
+          </div>
         </div>
 
         {selectedDay && (
@@ -156,7 +168,6 @@ export default function ChangeLogPage({ userEmail, isAdmin, onSignOut }: ChangeL
             counts={{ day: countFor(selectedDay, 'day'), night: countFor(selectedDay, 'night') }}
             activeKind={pickedShift?.dayKey === selectedDay ? pickedShift.kind : null}
             onPickShift={(kind) => setPickedShift({ dayKey: selectedDay, kind })}
-            onReport={() => setScopeDayKey(selectedDay)}
             onClear={handleClear}
           />
         )}

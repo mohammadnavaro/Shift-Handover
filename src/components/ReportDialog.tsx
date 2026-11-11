@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
-import { CalendarClock, Printer, Users } from 'lucide-react'; from '@/components/Modal';
+import { CalendarClock, Printer, Users } from 'lucide-react';
+import Modal from '@/components/Modal';
 import { CategoryBars, CoverageDonut, DailyTrend, UserTable } from '@/components/ReportCharts';
 import { toPersianDigits } from '@/lib/persianCalendar';
 import { computeReport, scopeTitle, type ReportScope } from '@/lib/reports';

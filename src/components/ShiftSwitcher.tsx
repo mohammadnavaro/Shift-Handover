@@ -1,4 +1,4 @@
-import { FileText, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { formatJalaliLong, toPersianDigits } from '@/lib/persianCalendar';
 import { SHIFT_HOURS, SHIFT_LABELS, type ShiftKind } from '@/lib/shifts';
 import { shiftBadgeClass } from '@/lib/shiftStyles';
@@ -8,11 +8,10 @@ interface ShiftSwitcherProps {
   counts: Record<ShiftKind, number>;
   activeKind: ShiftKind | null;
   onPickShift: (kind: ShiftKind) => void;
-  onReport: () => void;
   onClear: () => void;
 }
 
-export default function ShiftSwitcher({ dayKey, counts, activeKind, onPickShift, onReport, onClear }: ShiftSwitcherProps) {
+export default function ShiftSwitcher({ dayKey, counts, activeKind, onPickShift, onClear }: ShiftSwitcherProps) {
   const kinds: ShiftKind[] = ['day', 'night'];
 
   return (
@@ -42,15 +41,6 @@ export default function ShiftSwitcher({ dayKey, counts, activeKind, onPickShift,
           </button>
         ))}
       </div>
-
-      <button
-        type="button"
-        onClick={onReport}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-800 transition hover:border-stone-500"
-      >
-        <FileText size={14} aria-hidden />
-        گزارش
-      </button>
 
       <button
         type="button"
