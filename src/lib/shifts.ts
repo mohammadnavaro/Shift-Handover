@@ -24,6 +24,12 @@ export function shiftOf(date: Date): ShiftRef {
   return { dayKey: today, kind: hour < 19 ? 'day' : 'night' };
 }
 
+export function shiftHasEnded(shift: ShiftRef, now: Date): boolean {
+  const current = shiftOf(now);
+  if (shift.dayKey !== current.dayKey) return shift.dayKey < current.dayKey;
+  return shift.kind === 'day' && current.kind === 'night';
+}
+
 export function shiftGroupKey(dayKey: string, kind: ShiftKind): string {
   return `${dayKey}|${kind}`;
 }

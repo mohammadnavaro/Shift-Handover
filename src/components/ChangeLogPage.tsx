@@ -4,14 +4,18 @@ import ShiftSection from '@/components/ShiftSection';
 import ShiftSwitcher from '@/components/ShiftSwitcher';
 import StatusBar from '@/components/StatusBar';
 import DayPicker from '@/components/DayPicker';
+import ReportDialog from '@/components/ReportDialog';
+import ReportScopeDialog from '@/components/ReportScopeDialog';
 import { useChangeLog } from '@/hooks/useChangeLog';
 import { useNow } from '@/hooks/useNow';
-import { saveReason, type ReasonVersion } from '@/lib/changeLog';
+import { closeShift, saveReason, type ReasonVersion } from '@/lib/changeLog';
 import { dayKeyOf, formatJalaliShort, weekdayOfKey } from '@/lib/persianCalendar';
+import type { ReportScope } from '@/lib/reports';
 import {
   groupEventsByShift,
   shiftElementId,
   shiftGroupKey,
+  shiftHasEnded,
   shiftOf,
   type ShiftKind,
   type ShiftRef,
@@ -33,10 +37,17 @@ function scrollToShift(shift: ShiftRef) {
 }
 
 export default function ChangeLogPage({ userEmail, isAdmin, onSignOut }: ChangeLogPageProps) {
-  const { events, reasons, status, reload } = useChangeLog();
+  const { events, reasons, closures, status, reload } = useChangeLog();
   const now = useNow();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [pickedShift, setPickedShift] = useState<ShiftRef | null>(null);
+  const [scopeDayKey, setScopeDayKey] = useState<string | null>(null);
+  const [reportScope, setReportScope] = useState<ReportScope | null>(null);
+
+  const closedKeys = useMemo(
+    () => new Set(closures.map((closure) => shiftGroupKey(closure.day_key, closure.kind))),
+    [closures]
+  );
 
   const currentShift = shiftOf(now);
   const groups = useMemo(() => groupEventsByShift(events), [events]);
@@ -70,6 +81,7 @@ export default function ChangeLogPage({ userEmail, isAdmin, onSignOut }: ChangeL
 
   const handlePickDay = (dayKey: string) => {
     setSelectedDay(dayKey);
+    setScopeDayKey(dayKey);
     const kind = dayKey === currentShift.dayKey ? currentShift.kind : 'day';
     setPickedShift({ dayKey, kind });
   };
@@ -81,6 +93,11 @@ export default function ChangeLogPage({ userEmail, isAdmin, onSignOut }: ChangeL
 
   const handleSaveReason = async (eventId: string, body: string) => {
     await saveReason(eventId, body);
+    await reload();
+  };
+
+  const handleCloseShift = async (shift: ShiftRef) => {
+    await closeShift(shift.dayKey, shift.kind);
     await reload();
   };
 
@@ -139,6 +156,7 @@ export default function ChangeLogPage({ userEmail, isAdmin, onSignOut }: ChangeL
             counts={{ day: countFor(selectedDay, 'day'), night: countFor(selectedDay, 'night') }}
             activeKind={pickedShift?.dayKey === selectedDay ? pickedShift.kind : null}
             onPickShift={(kind) => setPickedShift({ dayKey: selectedDay, kind })}
+            onReport={() => setScopeDayKey(selectedDay)}
             onClear={handleClear}
           />
         )}
@@ -182,12 +200,31 @@ export default function ChangeLogPage({ userEmail, isAdmin, onSignOut }: ChangeL
                   reasonsByEvent={reasonsByEvent}
                   isCurrent={currentShift.dayKey === dayKey && currentShift.kind === kind}
                   isPicked={pickedShift?.dayKey === dayKey && pickedShift.kind === kind}
+                  isClosed={closedKeys.has(shiftGroupKey(dayKey, kind))}
+                  canClose={shiftHasEnded(shift, now) && !closedKeys.has(shiftGroupKey(dayKey, kind))}
                   onSaveReason={handleSaveReason}
+                  onOpenReport={(target) => setReportScope({ type: 'shift', dayKey: target.dayKey, kind: target.kind })}
+                  onCloseShift={handleCloseShift}
                 />
               );
             })}
           </section>
         ))}
+
+        {scopeDayKey && (
+          <ReportScopeDialog
+            dayKey={scopeDayKey}
+            onSelect={(scope) => {
+              setScopeDayKey(null);
+              setReportScope(scope);
+            }}
+            onClose={() => setScopeDayKey(null)}
+          />
+        )}
+
+        {reportScope && (
+          <ReportDialog scope={reportScope} events={events} reasons={reasons} onClose={() => setReportScope(null)} />
+        )}
       </main>
     </div>
   );

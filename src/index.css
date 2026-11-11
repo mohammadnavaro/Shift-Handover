@@ -14,3 +14,56 @@ body {
   background-color: #0a1628;
   color: #f1f5fb;
 }
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #report-print-area,
+  #report-print-area * {
+    visibility: visible;
+  }
+
+  #report-print-area {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    overflow: visible;
+    max-height: none;
+    background: #ffffff;
+    color: #0f172a;
+  }
+
+  #report-print-area .print-only {
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  #report-print-area *:not([data-keep]) {
+    color: #0f172a !important;
+    background-color: transparent !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: none !important;
+  }
+
+  #report-print-area section,
+  #report-print-area [role='dialog'] {
+    break-inside: avoid;
+  }
+
+  [data-keep],
+  [data-keep] * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
